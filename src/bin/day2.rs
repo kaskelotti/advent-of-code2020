@@ -49,11 +49,28 @@ fn main() -> io::Result<()> {
         return count >= password.req.min && count <= password.req.max;
     };
 
+    // second part validator
+    let is_valid2 = |password: &Password| {
+
+        // Poor naming in Requirement struct due to original problem domain in part 1
+        let index1 = password.req.min - 1;
+        let index2 = password.req.max - 1;
+
+        return password.text.char_indices()
+            .filter(|(index, char)| {
+                char.to_string() == password.req.char && (
+                    index1 == *index || index2 == *index
+                )
+            })
+            .count() == 1;
+    };
+
     let file = File::open("./data/day2-input.txt")?;
     let count = io::BufReader::new(file)
         .lines()
         .map(|line| parse_password(line.unwrap()))
-        .filter(|password| is_valid(password))
+        //.filter(|password| is_valid(password))    // part 1
+        .filter(|password| is_valid2(password))     // part 2
         .count();
 
     println!("count {}", count);
